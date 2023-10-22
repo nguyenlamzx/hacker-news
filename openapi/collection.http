@@ -1,0 +1,23 @@
+
+# get topstories
+get https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty
+
+###
+
+# get newstories
+get https://hacker-news.firebaseio.com/v0/newstories.json?print=pretty
+
+###
+
+# get beststories
+get https://hacker-news.firebaseio.com/v0/beststories.json?print=pretty
+
+###
+
+# get story
+get https://hacker-news.firebaseio.com/v0/item/8863.json?print=pretty
+
+###
+
+# get comment
+get https://hacker-news.firebaseio.com/v0/item/2921983.json?print=pretty

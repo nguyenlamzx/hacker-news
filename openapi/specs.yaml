@@ -1,0 +1,259 @@
+openapi: 3.0.0
+info:
+  title: Hacker News API
+  description: Public Hacker News API for accessing stories, comments, users, and live data.
+  version: 1.0.0
+
+paths:
+  # /v0/maxitem:
+  #   get:
+  #     summary: Get the current largest item ID
+  #     responses:
+  #       '200':
+  #         description: Current largest item ID retrieved successfully.
+  #         content:
+  #           application/json:
+  #             example: 9130260
+
+  /v0/{storyId}.json:
+    get:
+      summary: Get up to 500 [top|new|best] stories
+      parameters:
+        - $ref: "#/components/parameters/storyId"
+        - $ref: "#/components/parameters/print"
+      responses:
+        '200':
+          description: List of up to 500 top story IDs retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListOfItemId"
+
+  # /v0/askstories:
+  #   get:
+  #     summary: Get up to 200 latest Ask HN stories
+  #     parameters:
+  #       - $ref: "#/components/parameters/print"
+  #     responses:
+  #       '200':
+  #         description: List of up to 200 latest Ask HN story IDs retrieved successfully.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/ListOfItemId"
+
+  # /v0/showstories:
+  #   get:
+  #     summary: Get up to 200 latest Show HN stories
+  #     parameters:
+  #       - $ref: "#/components/parameters/print"
+  #     responses:
+  #       '200':
+  #         description: List of up to 200 latest Show HN story IDs retrieved successfully.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/ListOfItemId"
+
+  # /v0/jobstories:
+  #   get:
+  #     summary: Get up to 200 latest Job stories
+  #     parameters:
+  #       - $ref: "#/components/parameters/print"
+  #     responses:
+  #       '200':
+  #         description: List of up to 200 latest Job story IDs retrieved successfully.
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/ListOfItemId"
+
+  # /v0/updates:
+  #   get:
+  #     summary: Get changed items and profiles
+  #     parameters:
+  #       - $ref: "#/components/parameters/print"
+  #     responses:
+  #       '200':
+  #         description: List of updated item and profile IDs retrieved successfully.
+  #         content:
+  #           application/json:
+  #             example:
+  #               items: [8423305, 8420805, 8423379, ...]
+  #               profiles: ["thefox", "mdda", "plinkplonk", ...]
+
+  /v0/item/{itemId}.json:
+    parameters:
+      - $ref: "#/components/parameters/itemId"
+      - $ref: "#/components/parameters/print"
+    get:
+      summary: Get item details by itemId
+      responses:
+        '200':
+          description: Item details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HackerNewsItem"
+
+  /v0/user/{userId}.json:
+    parameters:
+      - $ref: "#/components/parameters/userId"
+      - $ref: "#/components/parameters/itemId"
+    get:
+      summary: Get user details by username
+      responses:
+        '200':
+          description: User details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: The user's unique username. Case-sensitive.
+        created:
+          type: integer
+          description: Creation date of the user, in Unix Time.
+        karma:
+          type: integer
+          description: The user's karma
+        about:
+          type: string
+          description: The user's optional self-description. HTML.
+        submitted:
+          type: array
+          items:
+            type: integer
+          description: List of the user's stories, polls and comments.
+      example:
+        id: "jl"
+        created: 1173923446
+        karma: 5063
+        about: "This user hasn't filled out their bio yet."
+        submitted:
+          - 27686103
+          - 27686040
+    ListOfItemId:
+      type: array
+      items:
+        type: number
+      example: [2921983, 2921984, 2921985, ...] # A truncated list of IDs
+    
+    HackerNewsItem:
+      type: object
+      required:
+        - id
+        - by
+        - time
+        - type
+      properties:
+        id:
+          type: integer
+          description: The item's unique ID.
+        by:
+          type: string
+          description: The username of the item's author.
+        time:
+          type: integer
+          description: Creation date of the item, in Unix Time.
+        text:
+          type: string
+          description: The comment, story, or poll text (HTML).
+        kids:
+          type: array
+          items:
+            type: integer
+          description: The IDs of the item's comments, in ranked display order.
+        descendants:
+          type: integer
+          description: In the case of stories or polls, the total comment count.
+        score:
+          type: integer
+          description: The story's score, or the votes for a pollopt.
+        title:
+          type: string
+          description: The title of the story, poll, or job (HTML).
+        type:
+          $ref: "#/components/schemas/HackerNewsItemType"
+          description: The type of item. One of "story," "comment," "job," "poll," or "pollopt."
+        url:
+          type: string
+          format: uri
+          description: The URL of the story.
+
+    HackerNewsItemType:
+      type: string
+      enum:
+        - "story"
+        - "comment"
+        # - "ask"
+        - "job"
+        - "poll"
+        - "pollopt"
+
+    HackerNewsStory:
+      allOf:
+        - $ref: '#/components/schemas/HackerNewsItem'
+
+    HackerNewsComment:
+      allOf:
+        - $ref: '#/components/schemas/HackerNewsItem'
+
+    HackerNewsJob:
+      allOf:
+        - $ref: '#/components/schemas/HackerNewsItem'
+
+    HackerNewsPoll:
+      allOf:
+        - $ref: '#/components/schemas/HackerNewsItem'
+
+    HackerNewsPollopt:
+      allOf:
+        - $ref: '#/components/schemas/HackerNewsItem'
+
+  # requestBodies:
+  #   User:
+  #     content:
+  #       application/json:
+  #         schema:
+  #           $ref: "#/components/schemas/User"
+  parameters:
+    storyId:
+      name: storyId
+      in: path
+      description: The story Id
+      required: true
+      schema:
+        type: string
+    userId:
+      name: userId
+      in: path
+      description: The username of the Hacker News user.
+      required: true
+      schema:
+        type: string
+    itemId:
+      name: itemId
+      in: path
+      description: The ID of the Hacker News item.
+      required: true
+      schema:
+        type: integer
+    print:
+      name: print
+      in: query
+      description: Set to "pretty" for pretty-printed JSON.
+      schema:
+        type: string
+      example: pretty
+
