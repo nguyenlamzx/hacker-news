@@ -41,6 +41,12 @@
     "experiments": {
       "typedRoutes": true
     },
-    "scheme": "hacker-news"
+    "scheme": "hacker-news",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f1716be7-b524-4879-8a92-9f1063b343b0"
+    }
   }
 }
