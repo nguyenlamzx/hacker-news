@@ -24,7 +24,7 @@ marp: true
 
 # Submission:
 
-- Submit the expo app and source code. [test with github push]
+- Submit the expo app and source code. [test with github push, t2]
 
 ---
 
